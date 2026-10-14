@@ -1,0 +1,1 @@
+Vertical Clip Studio sürümleri
