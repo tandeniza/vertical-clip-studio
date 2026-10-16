@@ -114,7 +114,7 @@
     if (pc) return;
     clearInterval(helloTimer);
     setMsg(T.direct);
-    pc = new RTCPeerConnection({ iceServers: [...P.DEFAULT_ICE, ...(cfg.ice || [])] });
+    pc = new RTCPeerConnection({ iceServers: [...P.DEFAULT_ICE, ...(cfg.ice || []), ...(Array.isArray(m.ice) ? m.ice : [])] });
     pc.onicecandidate = (e) => send({ t: 'ice', peer, from: 'phone', c: e.candidate ? e.candidate.toJSON() : null });
     pc.ondatachannel = (e) => { clearTimeout(iceTimer); receive(e.channel); };
     pc.onconnectionstatechange = () => { if (pc.connectionState === 'failed') fail(T.ice); else if (pc.connectionState === 'disconnected' && !finished) setTimeout(() => { if (pc && pc.connectionState !== 'connected' && !finished) fail(T.lost); }, 8000); };

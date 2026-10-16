@@ -66,7 +66,10 @@
   function checkSignal(m) {
     if (!m || typeof m !== 'object' || typeof m.t !== 'string' || !PEER_RE.test(String(m.peer || ''))) return null;
     if (m.t === 'hello' || m.t === 'busy') return m;
-    if ((m.t === 'offer' || m.t === 'answer') && typeof m.sdp === 'string' && m.sdp.length < 200000) return m;
+    if ((m.t === 'offer' || m.t === 'answer') && typeof m.sdp === 'string' && m.sdp.length < 200000) {
+      if (m.t === 'offer' && m.ice != null) m.ice = sanitizeIce(m.ice); // TURN aktarıcısı (teklifle gelir; QR'a girmez)
+      return m;
+    }
     if (m.t === 'ice' && (m.from === 'pc' || m.from === 'phone') && (m.c === null || (typeof m.c === 'object' && typeof m.c.candidate === 'string' && m.c.candidate.length < 2000))) return m;
     return null;
   }
