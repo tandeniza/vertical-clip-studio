@@ -8,6 +8,9 @@
 // Mesajlar (broadcast olayı 'sig'):  telefon -> { t:'hello', peer }   masaüstü -> { t:'offer', peer, sdp }
 //   telefon -> { t:'answer', peer, sdp }   iki yön -> { t:'ice', peer, from, c }   masaüstü -> { t:'busy', peer }
 // Veri kanalı ('file', sıralı): metin { t:'meta', name, size, mime } -> ikili parçalar -> metin { t:'end' }; telefon { t:'got' }
+// Telefondan bilgisayara (m=up): telefon her dosya için { t:'meta', idx, name, size, mime } -> bilgisayar { t:'ready', idx } ya da
+//   { t:'reject', idx, code } -> telefon ikili parçalar + { t:'end', idx } -> bilgisayar { t:'saved', idx } / { t:'fail', idx, code };
+//   en sonda telefon { t:'done' }
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.P2PProto = factory();
@@ -23,9 +26,10 @@
   const topic = (sid) => `tda-p2p-${sid}`;
 
   /** QR adresi: sayfa + #s=oturum&u=supabase&k=yayınlanabilir anahtar (+ isteğe bağlı TURN listesi) */
-  function buildUrl(page, { sid, supabaseUrl, key, ice }) {
+  function buildUrl(page, { sid, supabaseUrl, key, ice, mode }) {
     const q = new URLSearchParams();
     q.set('v', String(VERSION));
+    if (mode === 'up') q.set('m', 'up'); // telefondan bilgisayara gönderme
     q.set('s', sid);
     const m = /^https:\/\/([a-z0-9]{20})\.supabase\.co$/i.exec(String(supabaseUrl || ''));
     q.set('u', m ? m[1] : String(supabaseUrl || '')); // standart adres yalnızca proje kimliğiyle (kısa QR)
@@ -46,7 +50,7 @@
     else return null;
     let ice = null;
     try { const x = JSON.parse(q.get('i') || 'null'); if (Array.isArray(x)) ice = sanitizeIce(x); } catch (_) { ice = null; }
-    return { v: Number(q.get('v')) || 1, sid, supabaseUrl, key, ice };
+    return { v: Number(q.get('v')) || 1, sid, supabaseUrl, key, ice, mode: q.get('m') === 'up' ? 'up' : 'down' };
   }
   /** ICE sunucu listesini doğrular (yalnızca stun: / turn: / turns: adresleri) */
   function sanitizeIce(list) {

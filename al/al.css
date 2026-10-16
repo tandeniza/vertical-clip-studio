@@ -17,3 +17,13 @@ video { width: 100%; max-height: 50vh; border-radius: 12px; background: #000; ma
 .btn { display: block; text-align: center; padding: 13px 16px; border-radius: 12px; border: 1px solid var(--line); background: transparent; color: var(--text); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .note { font-size: 13px; color: var(--muted); margin: 16px 0 0; }
+.up { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.pick { cursor: pointer; }
+.files { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.files li { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 14px; }
+.files .nm { display: flex; justify-content: space-between; gap: 8px; }
+.files .nm span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files .st { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.files .st.ok { color: #1f9d55; } .files .st.err { color: #d33a3a; }
+.files .bar { height: 6px; margin-top: 6px; }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
